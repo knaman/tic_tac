@@ -1,0 +1,145 @@
+<!doctype html>
+<head>
+</head>
+<style>
+.container {
+width:150px;
+position: relative;
+left:600px;
+top:100px;
+}
+#tbl{
+	width: 100%;
+}
+td{
+	border:2px solid black;
+}
+.pl1,.pl2{
+	float: left;
+	margin: 5px;
+}
+</style>
+<body>
+<div>
+	<input type="radio" name="asdf" value="3">3x3</input>
+	<input type="radio" name="asdf" value="4">4x4</input>
+	<input type="radio" name="asdf" value="5">5x5</input>
+<div class="container">
+<table id="tbl">
+</table>
+<div class="pl1"></div>
+<div class="pl2"></div>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+$( "input" ).on( "click", function() {
+  var n=$( "input:checked" ).val(); //getting the board type
+  game(n);
+});
+function game(n){
+var player=0;
+var pl1=0;
+var pl2=0;
+var tic;
+var a = [];
+var winner = []; //stores the winning combination in a 2D Array..for eg for n=3 it is
+				//[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]] 
+var p,q,r,s;
+var content="";
+var temp;
+r=0;
+s=n-1;
+$(".pl1").html("Player1:<b> 0 </b>");
+$(".pl2").html("Player2:<b> 0 </b>");
+for(var i=0;i<n;i++){
+	temp="<tr>";
+	for(var j=0;j<n;j++){
+	 var id=i*n+j;
+     temp+="<td id="+id+">..</td>";
+     a.push("");
+	}
+	temp+="</tr>";
+	content+=temp;
+}
+$("#tbl").html(content);
+//calculating the winning combination
+for(var i=0;i<(2*n+2);i++)
+{
+	var col=[];
+	if(i<n)
+	p=i*n;
+    else if (i>=n&&i<2*n)
+    q=i-n;
+	for(var j=0;j<n;j++){
+        if(i<n){
+		col.push(p);
+		p=p+1;
+	   }
+	   else if (i>=n&&i<2*n)
+	   {
+       col.push(q);
+       q=q+n*1;
+	   }
+	   else{
+	   	if(i==2*n)
+	   	{
+	   	col.push(r);
+	   	r=r+n*1+1;
+	    }
+	   else{
+         col.push(s);
+         s=s+n*1-1;
+	    }
+	   }
+	}
+	winner.push(col);
+}
+console.log(winner)
+$("#tbl td").click(function(){
+	if($(this).text()==".."){
+	var id=$(this).attr("id");
+	if(!player){
+	tic="X";
+	$(this).text(tic);
+     }
+ 	else{
+ 	tic="O";
+ 	$(this).text(tic);
+ 	}
+	player=1-player;
+    a[id]=tic;
+    var z=checkWinner(winner,a,n,tic);
+    if(z=="X")
+		{
+			pl1++;
+            $(".pl1").html("Player1:"+"<b>"+pl1+"</b>");
+            for(var i=0;i<n*n;i++)
+	 	    a[i]="";
+         }
+         else if(z=="O"){
+         	pl2++;
+            $(".pl2").html("Player2:"+"<b>"+pl2+"</b>");
+            for(var i=0;i<n*n;i++)
+	 	    a[i]="";
+             }
+}
+});
+}
+function checkWinner(winner,a,n,tic){
+for(var i=0;i<winner.length;i++){
+	var count=0;
+	for(var j=0;j<n;j++)
+	{
+	if(tic==a[winner[i][j]])
+	count++;
+    }
+    if(count==n){
+	 alert(tic+" Wins");
+	 $("#tbl td").text("..");
+	 return tic;
+	}
+}
+}
+</script>
+</body>
+</html>
