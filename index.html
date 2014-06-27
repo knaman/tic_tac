@@ -30,27 +30,33 @@ td{
 <div class="pl1"></div>
 <div class="pl2"></div>
 </div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="jq.js"></script>
 <script>
 $( "input" ).on( "click", function() {
   var n=$( "input:checked" ).val(); //getting the board type
   game(n);
 });
-function game(n){
-var player=0;
-var pl1=0;
-var pl2=0;
+var pl1;
+var pl2;
 var tic;
-var a = [];
-var winner = []; //stores the winning combination in a 2D Array..for eg for n=3 it is
+var a;
+var winner; //stores the winning combination in a 2D Array..for eg for n=3 it is
 				//[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]] 
 var p,q,r,s;
-var content="";
+var content;
 var temp;
+var cpu;
+function game(n){
 r=0;
 s=n-1;
-$(".pl1").html("Player1:<b> 0 </b>");
-$(".pl2").html("Player2:<b> 0 </b>");
+pl1=0;
+pl2=0;
+winner=[];
+content="";
+cpu=[];
+a=[];
+$(".pl1").html("Player:<b> 0 </b>");
+$(".pl2").html("CPU:<b> 0 </b>");
 for(var i=0;i<n;i++){
 	temp="<tr>";
 	for(var j=0;j<n;j++){
@@ -98,34 +104,51 @@ console.log(winner)
 $("#tbl td").click(function(){
 	if($(this).text()==".."){
 	var id=$(this).attr("id");
-	if(!player){
 	tic="X";
 	$(this).text(tic);
-     }
- 	else{
- 	tic="O";
- 	$(this).text(tic);
- 	}
-	player=1-player;
-    a[id]=tic;
-    var z=checkWinner(winner,a,n,tic);
+	cpu.push(id);
+	a[id]=tic;
+    var z=checkWinner(n);
     if(z=="X")
 		{
 			pl1++;
-            $(".pl1").html("Player1:"+"<b>"+pl1+"</b>");
+            $(".pl1").html("Player:"+"<b>"+pl1+"</b>");
             for(var i=0;i<n*n;i++)
 	 	    a[i]="";
          }
-         else if(z=="O"){
+         setTimeout(cpu_play(n),1000);
+        }
+ });
+}
+function cpu_play(n){
+var flag=0;
+ 		while(1&&cpu.length){
+ 			if(flag)
+ 			break;
+ 	  var id=Math.floor(Math.random() * (n*n));
+ 	for(var i=0;i<cpu.length ;i++){
+ 		if(cpu[i]==id){
+ 			id=Math.floor(Math.random() * (n*n));
+ 			flag=0;
+ 			break;
+ 		}
+ 	    else
+ 	    flag=1;
+ 	}
+    }
+ 	cpu.push(id);
+ 	tic="O";
+ 	a[id]=tic;
+ 	$("#"+id+"").text(tic);
+ 	var z=checkWinner(n);
+ 	if(z=="O"){
          	pl2++;
-            $(".pl2").html("Player2:"+"<b>"+pl2+"</b>");
+            $(".pl2").html("CPU:"+"<b>"+pl2+"</b>");
             for(var i=0;i<n*n;i++)
 	 	    a[i]="";
              }
-}
-});
-}
-function checkWinner(winner,a,n,tic){
+     }
+function checkWinner(n){
 for(var i=0;i<winner.length;i++){
 	var count=0;
 	for(var j=0;j<n;j++)
@@ -136,6 +159,9 @@ for(var i=0;i<winner.length;i++){
     if(count==n){
 	 alert(tic+" Wins");
 	 $("#tbl td").text("..");
+	 for(var i=0;i<n*n;i++)
+	 a[i]=[""];
+	 cpu=[];
 	 return tic;
 	}
 }
